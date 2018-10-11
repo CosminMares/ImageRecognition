@@ -16,23 +16,26 @@ PICKLE_FILE = 'encodings.pickle'
 data = pickle.loads(open(PICKLE_FILE, "rb").read())
 detector = cv2.CascadeClassifier(CLASSIFIER_FILE)
 
+#to try to set params
+
 # initialize the video stream and allow the camera sensor to warm up
 vs = VideoStream(src=0).start()
 # vs = VideoStream(usePiCamera=True).start()
 time.sleep(2.0)
 
 # start the FPS counter
-fps = FPS().start()
+#fps = FPS().start()
 
 # feedback variabels
 lastName=""
 acceptSpeech=True
 
-
+activeNames = {}
 def switchSpeachFunctionality():
-	global acceptSpeech
-	acceptSpeech = not acceptSpeech
-
+#	global acceptSpeech
+#	acceptSpeech = not acceptSpeech
+	for name in activeNames:
+		activeNames[name] = True
 
 
 # loop over frames from the video file stream
@@ -40,12 +43,12 @@ while True:
 	# grab the frame from the threaded video stream and resize it
 	# to 500px (to speedup processing)
 	frame = vs.read()
-	frame = imutils.resize(frame, width=500)
+	frame = imutils.resize(frame, width=400)
 	
 	# convert the input frame from (1) BGR to grayscale (for face
 	# detection) and (2) from BGR to RGB (for face recognition)
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) #to try to 
 
 	# detect faces in the grayscale frame
 	rects = detector.detectMultiScale(gray, scaleFactor=1.1, 
@@ -89,7 +92,13 @@ while True:
 		
 		# update the list of names
 		names.append(name)
-
+	
+	#set the active state of names
+	#a method is needed to toggle the state  
+	
+	for name in names:
+		activeNames.update({name:True})
+		
 	# loop over the recognized faces
 	for ((top, right, bottom, left), name) in zip(boxes, names):
 		# draw the predicted face name on the image
@@ -105,13 +114,14 @@ while True:
 		print("[INFO] detected new person: " + name + " last person detected was " + lastName)
 		lastName = name
 		print acceptSpeech
-		if acceptSpeech:
-			if(name!="Unknown"):
+		#if acceptSpeech:
+		if(name!="Unknown" and activeNames.get(name)):
 				speechFilename=name + ".mp3"
 				os.system("mpg321 " + speechFilename)
 				print("[INFO] playing " + speechFilename)
 				switchSpeachFunctionality()
-				t = Timer(10,switchSpeachFunctionality)
+				#t = Timer(10,switchSpeachFunctionality())
+				t = Timer(10, switchSpeachFunctionality())
 				t.start()
 
 
@@ -124,13 +134,13 @@ while True:
 		break
 
 	# update the FPS counter
-	fps.update()
+'''	fps.update()
 
 # stop the timer and display FPS information
 fps.stop()
 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-
+'''
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
