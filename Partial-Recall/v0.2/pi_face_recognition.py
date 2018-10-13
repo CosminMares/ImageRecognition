@@ -15,7 +15,8 @@ PICKLE_FILE = 'encodings.pickle'
 CONFIG_NAMES_FILE = 'names.config'
 
 activeNames = {}
-timeout = 5
+timeout = 25
+isPi = False
 
 data = pickle.loads(open(PICKLE_FILE, "rb").read())
 detector = cv2.CascadeClassifier(CLASSIFIER_FILE)
@@ -24,25 +25,26 @@ def getConfigInfo(activeNames):
 	f = open(CONFIG_NAMES_FILE,'r')
 	for line in f:
 		if not line.startswith('#'):
-			activeNames.update({line.strip():1})
+			activeNames.update({line.strip():True})
 	f.close()
 
 def switchNameActiveState():
 	for name in activeNames:
-		activeNames[name] = 1
-	print activeNames
+		activeNames[name] = True
 
 getConfigInfo(activeNames)
 
 # initialize the video stream and allow the camera sensor to warm up
-vs = VideoStream(src=0).start()
-# vs = VideoStream(usePiCamera=True).start()
+if isPi:
+	vs = VideoStream(usePiCamera=True).start()
+else:
+	vs = VideoStream(src=0).start()
+
 time.sleep(2.0)
 
 # loop over frames from the video file stream
 while True:
 	# grab the frame from the threaded video stream and resize it
-	# to 500px (to speedup processing)
 	frame = vs.read()
 	frame = imutils.resize(frame, width=400)
 	
@@ -52,7 +54,7 @@ while True:
 	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) #to try only with 
 
 	# detect faces in the grayscale frame
-	rects = detector.detectMultiScale(gray, scaleFactor=1.1, 
+	rects = detector.detectMultiScale(rgb, scaleFactor=1.1, #this was changed to rgb from gray
 		minNeighbors=5, minSize=(30, 30),
 		flags=cv2.CASCADE_SCALE_IMAGE)
 	
@@ -104,10 +106,10 @@ while True:
 			0.75, (0, 255, 0), 2)
 
 	# decide and playback the name
-	if(name != "Unknown" and activeNames.get(name) == 1):
+	if(name != "Unknown" and activeNames.get(name)):
 		speechFilename=name + ".mp3"
-		os.system("mpg321 " + speechFilename)
-		activeNames.update({name:0})
+		os.system("mpg321 -q " + speechFilename)
+		activeNames.update({name:False})
 		t = Timer(timeout,switchNameActiveState)
 		if (not t.is_alive()):
 			t.start()
