@@ -2,26 +2,28 @@
 Image recognition project built in python using OpenCV.
 
 ------------------------------------------------------------------------
-Environment install instructions
+**Environment install instructions**
 
-Install Rasbian
+*Install Rasbian*
 
-Update
+*Update*
+
 sudo apt-get update
 
-Install video module
 
-Check video module
+*Install video module*
+
+*Check video module*
 	sudo raspi-config
 		Interfacing Options => P1 Camera => Enable
 		Advanced Options => Memory Split => 144mb
 	raspistill -o cam.jpg
 	
-Install dlib
-# instruction based on : 
-# https://www.pyimagesearch.com/2017/05/01/install-dlib-raspberry-pi/
-# if there is ever an issue might be worth checking :
-# https://www.pyimagesearch.com/2018/01/22/install-dlib-easy-complete-guide/
+*Install dlib*
+instruction based on : 
+https://www.pyimagesearch.com/2017/05/01/install-dlib-raspberry-pi/
+if there is ever an issue might be worth checking :
+https://www.pyimagesearch.com/2018/01/22/install-dlib-easy-complete-guide/
 	Update swap file size
 		sudo nano /etc/dphys-swapfile
 		CONF_SWAPSIZE=1024
@@ -56,12 +58,12 @@ Install dlib
 			Advanced Options => Memory Split => 144mb #144 for camera to work 64 default
 	Reboot to console
 	
-Audio
+*Audio*
 	sudo apt-get update
 	sudo pip install gTTS
 	sudo apt-get install mpg321
 	
-Video
+*Video*
 	sudo apt-get update
 	sudo apt-get install build-essential
 	sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
